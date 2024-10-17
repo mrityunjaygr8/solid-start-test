@@ -1,11 +1,14 @@
+import { Navigate, redirect } from "@solidjs/router";
 import { createSignal } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "~/components/ui/card";
 import { TextFieldRoot, TextFieldLabel, TextField, TextFieldErrorMessage } from "~/components/ui/textfield";
 import pb from "~/libs/pb";
 import { setAuthState } from "~/stores/authStore";
+import { useNavigate } from "@solidjs/router";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = createSignal("");
   const [password, setPassword] = createSignal("");
   const [emailError, setEmailError] = createSignal("");
@@ -33,7 +36,7 @@ export default function LoginPage() {
         userId: authData.record.id
       });
       console.log("Logged in successfully", authData);
-      // TODO: Redirect to dashboard or home page
+      navigate("/", { replace: true }); // Redirect to index page
     } catch (error) {
       console.error("Login failed", error);
       // TODO: Show error message to user
