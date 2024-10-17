@@ -1,11 +1,23 @@
 import { createSignal } from "solid-js";
 import { Button } from "~/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "~/components/ui/card";
-import { TextFieldRoot, TextFieldLabel, TextField, TextFieldErrorMessage } from "~/components/ui/textfield";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "~/components/ui/card";
+import {
+  TextFieldRoot,
+  TextFieldLabel,
+  TextField,
+  TextFieldErrorMessage,
+} from "~/components/ui/textfield";
+import { usePocketbaseContext } from "~/libs/PocketbaseProvider";
 
-import pb from '~/libs/pb'
-
-export default function SignupPage()  {
+export default function SignupPage() {
+  const pb = usePocketbaseContext();
   const [name, setName] = createSignal("");
   const [email, setEmail] = createSignal("");
   const [password, setPassword] = createSignal("");
@@ -40,24 +52,28 @@ export default function SignupPage()  {
 
     // example create data
     const data = {
-        "email": email(),
-        "emailVisibility": true,
-        "password": password(),
-        "passwordConfirm": confirmPassword(),
-        "name": name(),
+      email: email(),
+      emailVisibility: true,
+      password: password(),
+      passwordConfirm: confirmPassword(),
+      name: name(),
     };
 
-    const record = await pb.collection('users').create(data);
+    const record = await pb.collection("users").create(data);
     console.log(record);
   };
 
   return (
-    <div class="h-[calc(100vh-3.5rem)] overflow-hidden bg-gray-100"> {/* Subtract nav height */}
+    <div class="h-[calc(100vh-3.5rem)] overflow-hidden bg-gray-100">
+      {" "}
+      {/* Subtract nav height */}
       <div class="flex items-center justify-center h-full overflow-y-auto">
         <Card class="w-[350px] m-4">
           <CardHeader>
             <CardTitle>Sign Up</CardTitle>
-            <CardDescription>Create a new account to get started.</CardDescription>
+            <CardDescription>
+              Create a new account to get started.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSignup} class="space-y-4">
@@ -69,7 +85,9 @@ export default function SignupPage()  {
                   onInput={(e) => setName(e.currentTarget.value)}
                   placeholder="Enter your name"
                 />
-                {nameError() && <TextFieldErrorMessage>{nameError()}</TextFieldErrorMessage>}
+                {nameError() && (
+                  <TextFieldErrorMessage>{nameError()}</TextFieldErrorMessage>
+                )}
               </TextFieldRoot>
 
               <TextFieldRoot>
@@ -80,7 +98,9 @@ export default function SignupPage()  {
                   onInput={(e) => setEmail(e.currentTarget.value)}
                   placeholder="Enter your email"
                 />
-                {emailError() && <TextFieldErrorMessage>{emailError()}</TextFieldErrorMessage>}
+                {emailError() && (
+                  <TextFieldErrorMessage>{emailError()}</TextFieldErrorMessage>
+                )}
               </TextFieldRoot>
 
               <TextFieldRoot>
@@ -91,7 +111,11 @@ export default function SignupPage()  {
                   onInput={(e) => setPassword(e.currentTarget.value)}
                   placeholder="Create a password"
                 />
-                {passwordError() && <TextFieldErrorMessage>{passwordError()}</TextFieldErrorMessage>}
+                {passwordError() && (
+                  <TextFieldErrorMessage>
+                    {passwordError()}
+                  </TextFieldErrorMessage>
+                )}
               </TextFieldRoot>
 
               <TextFieldRoot>
@@ -102,7 +126,11 @@ export default function SignupPage()  {
                   onInput={(e) => setConfirmPassword(e.currentTarget.value)}
                   placeholder="Confirm your password"
                 />
-                {confirmPasswordError() && <TextFieldErrorMessage>{confirmPasswordError()}</TextFieldErrorMessage>}
+                {confirmPasswordError() && (
+                  <TextFieldErrorMessage>
+                    {confirmPasswordError()}
+                  </TextFieldErrorMessage>
+                )}
               </TextFieldRoot>
 
               <Button type="submit" class="w-full mt-6">

@@ -1,13 +1,26 @@
 import { Navigate, redirect } from "@solidjs/router";
 import { createSignal } from "solid-js";
 import { Button } from "~/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "~/components/ui/card";
-import { TextFieldRoot, TextFieldLabel, TextField, TextFieldErrorMessage } from "~/components/ui/textfield";
-import pb from "~/libs/pb";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "~/components/ui/card";
+import {
+  TextFieldRoot,
+  TextFieldLabel,
+  TextField,
+  TextFieldErrorMessage,
+} from "~/components/ui/textfield";
 import { setAuthState } from "~/stores/authStore";
 import { useNavigate } from "@solidjs/router";
+import { usePocketbaseContext } from "~/libs/PocketbaseProvider";
 
 export default function LoginPage() {
+  const pb = usePocketbaseContext();
   const navigate = useNavigate();
   const [email, setEmail] = createSignal("");
   const [password, setPassword] = createSignal("");
@@ -30,10 +43,12 @@ export default function LoginPage() {
     }
 
     try {
-      const authData = await pb.collection('users').authWithPassword(email(), password());
+      const authData = await pb
+        .collection("users")
+        .authWithPassword(email(), password());
       setAuthState({
         token: authData.token,
-        userId: authData.record.id
+        userId: authData.record.id,
       });
       console.log("Logged in successfully", authData);
       navigate("/", { replace: true }); // Redirect to index page
@@ -44,12 +59,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div class="h-[calc(100vh-3.5rem)] overflow-hidden bg-gray-100"> {/* Subtract nav height */}
+    <div class="h-[calc(100vh-3.5rem)] overflow-hidden bg-gray-100">
+      {" "}
+      {/* Subtract nav height */}
       <div class="flex items-center justify-center h-full overflow-y-auto">
         <Card class="w-[350px] m-4">
           <CardHeader>
             <CardTitle>Login</CardTitle>
-            <CardDescription>Enter your credentials to access your account.</CardDescription>
+            <CardDescription>
+              Enter your credentials to access your account.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} class="space-y-4">
@@ -61,7 +80,9 @@ export default function LoginPage() {
                   onInput={(e) => setEmail(e.currentTarget.value)}
                   placeholder="Enter your email"
                 />
-                {emailError() && <TextFieldErrorMessage>{emailError()}</TextFieldErrorMessage>}
+                {emailError() && (
+                  <TextFieldErrorMessage>{emailError()}</TextFieldErrorMessage>
+                )}
               </TextFieldRoot>
 
               <TextFieldRoot>
@@ -72,7 +93,11 @@ export default function LoginPage() {
                   onInput={(e) => setPassword(e.currentTarget.value)}
                   placeholder="Enter your password"
                 />
-                {passwordError() && <TextFieldErrorMessage>{passwordError()}</TextFieldErrorMessage>}
+                {passwordError() && (
+                  <TextFieldErrorMessage>
+                    {passwordError()}
+                  </TextFieldErrorMessage>
+                )}
               </TextFieldRoot>
 
               <Button type="submit" class="w-full mt-6">
