@@ -1,19 +1,20 @@
 import Client from "pocketbase";
 import { createContext, JSX, useContext } from "solid-js";
+import { TypedPocketBase } from "../../pocketbase-types";
 
 interface PocketbaseProviderProps {
   url: string;
   children: JSX.Element;
 }
 
-export const PocketbaseContext = createContext<Client>();
+export const PocketbaseContext = createContext<TypedPocketBase>();
 
 export const PocketbaseProvider = (props: PocketbaseProviderProps) => {
   if (!props.url) {
     throw new Error("PocketbaseProvider requires a url");
   }
 
-  const client = new Client(props.url);
+  const client = new Client(props.url) as TypedPocketBase;
   return <PocketbaseContext.Provider value={client}>{props.children}</PocketbaseContext.Provider>
 };
 
