@@ -1,8 +1,32 @@
 import { Navigate } from "@solidjs/router";
+import { ColumnDef } from "@tanstack/solid-table";
 import { createResource } from "solid-js";
+import { DataTable } from "~/components/ui/datatable";
 import { useAuthContext } from "~/libs/AuthProvider";
 import { usePocketbaseContext } from "~/libs/PocketbaseProvider";
+import {
+  FormItemQuestionResponse,
+  FormTemplateResponse,
+} from "~/types/pocketbase-types";
 
+const columns: ColumnDef<FormTemplateResponse>[] = [
+  {
+    accessorKey: "name",
+    header: "Name",
+  },
+  {
+    accessorKey: "description",
+    header: "Description",
+  },
+  {
+    accessorKey: "created",
+    header: "Created",
+  },
+  {
+    accessorKey: "id",
+    header: "ID",
+  },
+];
 export default function ListFormTemplate() {
   const client = usePocketbaseContext();
   const { user } = useAuthContext();
@@ -11,7 +35,7 @@ export default function ListFormTemplate() {
   }
 
   const [formTemplates] = createResource(() =>
-    client.collection("formTemplate").getList(),
+    client.collection("formTemplate").getList<FormTemplateResponse>(),
   );
   return (
     <div class="flex flex-col p-4">
@@ -21,7 +45,10 @@ export default function ListFormTemplate() {
         {formTemplates.loading && "Loading"}
         {formTemplates.error && "Error loading formTemplates"}
         {formTemplates() && (
-          <pre>{JSON.stringify(formTemplates(), null, 2)}</pre>
+          <>
+            <DataTable columns={columns} data={() => formTemplates()?.items} />
+            <pre>{JSON.stringify(formTemplates(), null, 2)}</pre>
+          </>
         )}
       </div>
     </div>
