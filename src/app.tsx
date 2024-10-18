@@ -24,28 +24,28 @@ const AuthenticatedNavigation = () => (
     <NavigationMenuItem>
       <NavigationMenuTrigger
         as="a"
-        href="/formitemtype"
+        href="/itemtypes"
         class="transition-[box-shadow,background-color] focus-visible:outline-none focus-visible:ring-[1.5px] focus-visible:ring-ring data-[expanded]:bg-accent"
       >
-        Form Item Types
+        Item Types
       </NavigationMenuTrigger>
     </NavigationMenuItem>
     <NavigationMenuItem>
       <NavigationMenuTrigger
         as="a"
-        href="/formitemquestion"
+        href="/questions"
         class="transition-[box-shadow,background-color] focus-visible:outline-none focus-visible:ring-[1.5px] focus-visible:ring-ring data-[expanded]:bg-accent"
       >
-        Form Item Questions
+        Questions
       </NavigationMenuTrigger>
     </NavigationMenuItem>
     <NavigationMenuItem>
       <NavigationMenuTrigger
         as="a"
-        href="/formtemplate"
+        href="/templates"
         class="transition-[box-shadow,background-color] focus-visible:outline-none focus-visible:ring-[1.5px] focus-visible:ring-ring data-[expanded]:bg-accent"
       >
-        Form Templates
+        Templates
       </NavigationMenuTrigger>
     </NavigationMenuItem>
     <NavigationMenuItem>
