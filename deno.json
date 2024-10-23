@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "lib": [
+        "ES2020",
+        "DOM",
+        "DOM.Iterable"
+      ],
+      "jsx": "react-jsx",
+      "jsxImportSource": "solid-js"
+    },
+    "imports": {
+      "~/": "./src/"
+    },
+    "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json"
+  }
