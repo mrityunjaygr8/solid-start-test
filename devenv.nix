@@ -9,7 +9,7 @@
   env.GREET = "devenv";
 
   # https://devenv.sh/packages/
-  packages = [pkgs.git pkgs.pocketbase pkgs.nodePackages.pnpm];
+  packages = [pkgs.git pkgs.pocketbase pkgs.deno];
 
   # https://devenv.sh/languages/
   # languages.rust.enable = true;
