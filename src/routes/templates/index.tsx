@@ -1,18 +1,35 @@
-import { Navigate } from "@solidjs/router";
 import { ColumnDef } from "@tanstack/solid-table";
 import { createResource } from "solid-js";
 import { DataTable } from "~/components/ui/datatable";
 import { useAuthContext } from "~/libs/AuthProvider";
 import { usePocketbaseContext } from "~/libs/PocketbaseProvider";
-import {
-  FormItemQuestionResponse,
-  FormTemplateResponse,
-} from "~/types/pocketbase-types";
+import { FormTemplateResponse } from "~/types/pocketbase-types";
+import { buttonVariants } from "~/components/ui/button.tsx";
+import { cn } from "~/libs/cn.ts";
+import { A, Navigate } from "@solidjs/router";
+import { IconLink } from "@tabler/icons-solidjs";
 
 const columns: ColumnDef<FormTemplateResponse>[] = [
   {
     accessorKey: "name",
     header: "Name",
+    cell: (props) => {
+      return (
+        <span class="flex">
+          <A
+            href={`/templates/${props.row.original.id}`}
+            class={cn(
+              buttonVariants({ variant: "link", size: "smallIcon" }),
+              "self-center",
+              "mr-2",
+            )}
+          >
+            <IconLink />
+          </A>
+          <span>{props.cell.getValue() as string}</span>
+        </span>
+      );
+    },
   },
   {
     accessorKey: "description",
@@ -35,7 +52,9 @@ export default function ListFormTemplate() {
   }
 
   const [formTemplates] = createResource(() =>
-    client.collection("formTemplate").getList<FormTemplateResponse>(),
+    client.collection("formTemplate").getList<FormTemplateResponse>(1, 20, {
+      expand: "questions",
+    }),
   );
   return (
     <div class="flex flex-col p-4">
