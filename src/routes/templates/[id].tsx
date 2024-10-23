@@ -5,6 +5,7 @@ import { usePocketbaseContext } from "~/libs/PocketbaseProvider";
 import { Collections } from "~/types/pocketbase-types";
 import { createSignal } from "solid-js";
 import type { FormTemplateResponse } from "../../types/pocketbase-types.ts";
+import FormWrapper from "~/components/formWrapper.tsx";
 
 // Stuff to Show
 // 1. Question ID
@@ -27,36 +28,18 @@ export default function DetailFormItemType() {
       expand: "questions,questions.formItemType",
     }),
   );
-  // const items = createSignal();
-  const questions = () =>
-    detailFormTemplate()
-      ?.expand?.questions.map((e) => ({
-        id: e.id,
-        questionText: e.questionText,
-        description: e.description,
-        values: e.values["options"],
-        formItemName: e.expand?.formItemType.name,
-        formItemSchema: e.expand?.formItemType.schema["options"],
-      }))
-      .reduce((acc, curr) => {
-        acc[curr.id] = { ...curr };
-        return acc;
-      }, {});
 
   return (
     <div class="flex flex-col p-4">
       <h1>Detail FormTemplate</h1>
 
       <div>
-        <Show
-          when={detailFormTemplate() && questions()}
-          fallback={<p>Loading...</p>}
-        >
+        <Show when={detailFormTemplate()} fallback={<p>Loading...</p>}>
           <>
-            <h1 class="text-4xl font-extrabold">Full</h1>
-            <pre>{JSON.stringify(detailFormTemplate(), null, 2)}</pre>
-            <h1 class="text-4xl font-extrabold">Questions</h1>
-            <pre>{JSON.stringify(questions(), null, 2)}</pre>
+            <FormWrapper template={detailFormTemplate} />
+
+            {/* <h1 class="text-4xl font-extrabold">Full</h1> */}
+            {/* <pre>{JSON.stringify(detailFormTemplate(), null, 2)}</pre> */}
           </>
         </Show>
         <Show when={detailFormTemplate.error}>
