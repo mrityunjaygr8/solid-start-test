@@ -1,78 +1,106 @@
-import type { FormTemplateResponse } from "~/types/pocketbase-types.ts";
-import { Accessor, createMemo, For, Show } from "solid-js";
+import { createMemo, For, Show } from "solid-js";
 import { Dynamic } from "solid-js/web";
-
+import { createSignal } from "solid-js";
 import { Button } from "~/components/ui/button.tsx";
+import type { Campaign } from "~/types/campaign.ts";
 
 const shortText = await import("~/components/formItemTypes/shortText.tsx");
 const number = await import("~/components/formItemTypes/number.tsx");
 const fieldInputs = {
-	shortText: shortText,
-	number: number,
+  shortText: shortText,
+  number: number,
 };
 
+interface inputProps {
+  value: string | number;
+  setValue: (e: InputEvent) => void;
+  questionText: string;
+  description: string;
+}
+
 interface Question {
-	id: string;
-	questionText: string;
-	description: string;
-	values: object;
-	formItemName: string;
-	formItemSchema: object;
+  id: string;
+  questionText: string;
+  description: string;
+  values: object;
+  formItemName: "number" | "shortText";
+  formItemSchema: object;
 }
 
 interface QuestionDict {
-	[id: string]: Question;
+  [id: string]: Question;
 }
 
-export default function FormWrapper({
-	template,
-}: {
-	template: Accessor<FormTemplateResponse>;
-}) {
-	console.log(fieldInputs);
-	const questions = createMemo<QuestionDict>(() =>
-		template()
-			// this will create an array of json objects
-			.expand?.questions.map((e) => ({
-				id: e.id,
-				questionText: e.questionText,
-				description: e.description,
-				values: e.values["options"],
-				formItemName: e.expand?.formItemType.name,
-				formItemSchema: e.expand?.formItemType.schema["options"],
-			}))
-			// this will convert the array of json objects to a json object
-			// where the key will be value in the child objects id field
-			.reduce((acc, curr) => {
-				acc[curr.id] = { ...curr };
-				return acc;
-			}, {})
-	);
-	return (
-		<>
-			<Show when={questions()} fallback={<p>Loading....</p>}>
-				<h1 class="text-4xl font-extrabold">{template().name}</h1>
-				<h4 class="text-xl">{template().description}</h4>
+export default function FormWrapper({ campaign }: { campaign: Campaign }) {
+  const questions = createMemo<QuestionDict>(() => {
+    // this will create an array of json objects of type Question
+    const t = campaign.expand?.template.expand?.questions?.map((e) => {
+      const v = {
+        id: e.id,
+        questionText: e.questionText,
+        description: e.description,
+        values: e.values?.options,
+        formItemName: e.expand?.formItemType.name,
+        formItemSchema: e.expand?.formItemType.schema?.options,
+      };
+      return v;
+    }) as Question[];
+    // this will convert the array of questions to a QuestionDict
+    // where the key will be value of question id field
+    return t.reduce((acc: QuestionDict, curr: Question) => {
+      acc[curr.id] = { ...curr };
+      return acc;
+    }, {} as QuestionDict);
+  });
+  console.log(questions());
+  const [formData, setFormData] = createSignal<Record<string, string | number>>(
+    Object.values(questions()).reduce(
+      (acc, field) => {
+        acc[field.id] =
+          field.formItemName === "shortText" ? "deafult-value" : 23;
+        return acc;
+      },
+      {} as Record<string, string | number>,
+    ),
+  );
 
-				<form class="w-80 mt-4">
-					<For each={template().questions}>
-						{(questionID) => {
-							const q = questions()[questionID];
-							return (
-								<>
-									<Dynamic
-										component={fieldInputs[q.formItemName]
-											.default}
-										questionText={q.questionText}
-										description={q.description}
-									/>
-								</>
-							);
-						}}
-					</For>
-					<Button class="mt-4">Submit</Button>
-				</form>
-			</Show>
-		</>
-	);
+  const handleChange = (id: string, value: string | number): void => {
+    setFormData({ ...formData(), [id]: value });
+  };
+  return (
+    <>
+      <Show when={questions()} fallback={<p>Loading....</p>}>
+        <h1 class="text-4xl font-extrabold">
+          {campaign.expand?.template.name}
+        </h1>
+        <h4 class="text-xl">{campaign.expand?.template.description}</h4>
+
+        <form class="w-80 mt-4">
+          <For each={campaign.expand?.template.questions}>
+            {(questionID) => {
+              const q = questions()[questionID];
+              return (
+                <>
+                  <Dynamic
+                    component={fieldInputs[q.formItemName].default}
+                    questionText={q.questionText}
+                    description={q.description}
+                    value={formData()[q.id]}
+                    setValue={(e: InputEvent) =>
+                      handleChange(q.id, (e.target as HTMLInputElement).value)
+                    }
+                  />
+                </>
+              );
+            }}
+          </For>
+          <Button onClick={() => console.log(formData())} class="mt-4">
+            Submit
+          </Button>
+        </form>
+      </Show>
+    </>
+  );
 }
+
+export type { inputProps };
