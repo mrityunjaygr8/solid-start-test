@@ -67,7 +67,6 @@ export default function ListCampaigns() {
         {campaigns() && (
           <>
             <DataTable columns={columns} data={() => campaigns()?.items} />
-            <pre>{JSON.stringify(campaigns(), null, 2)}</pre>
           </>
         )}
       </div>

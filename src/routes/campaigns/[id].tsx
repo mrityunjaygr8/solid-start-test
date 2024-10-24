@@ -30,13 +30,13 @@ export default function DetailCampaign() {
 
   return (
     <div class="flex flex-col p-4">
-      <pre>{JSON.stringify(detailCampaign(), null, 2)}</pre>
+      {/* <pre>{JSON.stringify(detailCampaign(), null, 2)}</pre> */}
       <h1>Detail FormTemplate</h1>
 
       <div>
         <Show when={detailCampaign()} fallback={<p>Loading...</p>}>
           <>
-            <FormWrapper campaign={detailCampaign()} />
+            <FormWrapper campaign={detailCampaign()} userID={user().id} />
           </>
         </Show>
         <Show when={detailCampaign.error}>
