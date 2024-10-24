@@ -20,7 +20,10 @@ export const CardHeader = (props: ComponentProps<"div">) => {
 	const [local, rest] = splitProps(props, ["class"]);
 
 	return (
-		<div class={cn("flex flex-col space-y-1.5 p-6", local.class)} {...rest} />
+		<div
+			class={cn("flex flex-col space-y-1.5 p-6", local.class)}
+			{...rest}
+		/>
 	);
 };
 
@@ -41,7 +44,10 @@ export const CardDescription: ParentComponent<ComponentProps<"h3">> = (
 	const [local, rest] = splitProps(props, ["class"]);
 
 	return (
-		<h3 class={cn("text-sm text-muted-foreground", local.class)} {...rest} />
+		<h3
+			class={cn("text-sm text-muted-foreground", local.class)}
+			{...rest}
+		/>
 	);
 };
 

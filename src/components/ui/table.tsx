@@ -24,7 +24,10 @@ export const TableBody = (props: ComponentProps<"tbody">) => {
 	const [local, rest] = splitProps(props, ["class"]);
 
 	return (
-		<tbody class={cn("[&_tr:last-child]:border-0", local.class)} {...rest} />
+		<tbody
+			class={cn("[&_tr:last-child]:border-0", local.class)}
+			{...rest}
+		/>
 	);
 };
 
@@ -33,7 +36,10 @@ export const TableFooter = (props: ComponentProps<"tfoot">) => {
 
 	return (
 		<tbody
-			class={cn("bg-primary font-medium text-primary-foreground", local.class)}
+			class={cn(
+				"bg-primary font-medium text-primary-foreground",
+				local.class,
+			)}
 			{...rest}
 		/>
 	);

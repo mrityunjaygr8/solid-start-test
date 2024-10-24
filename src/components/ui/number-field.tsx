@@ -17,7 +17,8 @@ import { textfieldLabel } from "./textfield";
 export const NumberFieldHiddenInput = NumberFieldPrimitive.HiddenInput;
 
 type numberFieldLabelProps<T extends ValidComponent = "div"> =
-	NumberFieldLabelProps<T> & {
+	& NumberFieldLabelProps<T>
+	& {
 		class?: string;
 	};
 
@@ -35,7 +36,8 @@ export const NumberFieldLabel = <T extends ValidComponent = "div">(
 };
 
 type numberFieldDescriptionProps<T extends ValidComponent = "div"> =
-	NumberFieldDescriptionProps<T> & {
+	& NumberFieldDescriptionProps<T>
+	& {
 		class?: string;
 	};
 
@@ -58,7 +60,8 @@ export const NumberFieldDescription = <T extends ValidComponent = "div">(
 };
 
 type numberFieldErrorMessageProps<T extends ValidComponent = "div"> =
-	NumberFieldErrorMessageProps<T> & {
+	& NumberFieldErrorMessageProps<T>
+	& {
 		class?: string;
 	};
 
@@ -78,7 +81,8 @@ export const NumberFieldErrorMessage = <T extends ValidComponent = "div">(
 };
 
 type numberFieldProps<T extends ValidComponent = "div"> =
-	NumberFieldRootProps<T> & {
+	& NumberFieldRootProps<T>
+	& {
 		class?: string;
 	};
 
@@ -88,7 +92,10 @@ export const NumberField = <T extends ValidComponent = "div">(
 	const [local, rest] = splitProps(props as numberFieldProps, ["class"]);
 
 	return (
-		<NumberFieldPrimitive class={cn("grid gap-1.5", local.class)} {...rest} />
+		<NumberFieldPrimitive
+			class={cn("grid gap-1.5", local.class)}
+			{...rest}
+		/>
 	);
 };
 
@@ -107,7 +114,8 @@ export const NumberFieldGroup = (props: ComponentProps<"div">) => {
 };
 
 type numberFieldInputProps<T extends ValidComponent = "input"> =
-	NumberFieldInputProps<T> & {
+	& NumberFieldInputProps<T>
+	& {
 		class?: string;
 	};
 
@@ -139,9 +147,12 @@ export const NumberFieldDecrementTrigger = <
 >(
 	props: PolymorphicProps<T, VoidProps<numberFieldDecrementTriggerProps<T>>>,
 ) => {
-	const [local, rest] = splitProps(props as numberFieldDecrementTriggerProps, [
-		"class",
-	]);
+	const [local, rest] = splitProps(
+		props as numberFieldDecrementTriggerProps,
+		[
+			"class",
+		],
+	);
 
 	return (
 		<NumberFieldPrimitive.DecrementTrigger
@@ -182,9 +193,12 @@ export const NumberFieldIncrementTrigger = <
 >(
 	props: PolymorphicProps<T, numberFieldIncrementTriggerProps<T>>,
 ) => {
-	const [local, rest] = splitProps(props as numberFieldIncrementTriggerProps, [
-		"class",
-	]);
+	const [local, rest] = splitProps(
+		props as numberFieldIncrementTriggerProps,
+		[
+			"class",
+		],
+	);
 
 	return (
 		<NumberFieldPrimitive.IncrementTrigger

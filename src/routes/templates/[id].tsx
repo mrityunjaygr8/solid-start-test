@@ -16,36 +16,36 @@ import FormWrapper from "~/components/formWrapper.tsx";
 // 6. FormItemType Schema
 
 export default function DetailFormItemType() {
-  const { user } = useAuthContext();
-  if (user() == null || user() == undefined) {
-    return <Navigate href={"/login"} />;
-  }
+	const { user } = useAuthContext();
+	if (user() == null || user() == undefined) {
+		return <Navigate href={"/login"} />;
+	}
 
-  const params = useParams();
-  const client = usePocketbaseContext();
-  const [detailFormTemplate] = createResource(() =>
-    client.collection(Collections.FormTemplate).getOne(params.id, {
-      expand: "questions,questions.formItemType",
-    }),
-  );
+	const params = useParams();
+	const client = usePocketbaseContext();
+	const [detailFormTemplate] = createResource(() =>
+		client.collection(Collections.FormTemplate).getOne(params.id, {
+			expand: "questions,questions.formItemType",
+		})
+	);
 
-  return (
-    <div class="flex flex-col p-4">
-      <h1>Detail FormTemplate</h1>
+	return (
+		<div class="flex flex-col p-4">
+			<h1>Detail FormTemplate</h1>
 
-      <div>
-        <Show when={detailFormTemplate()} fallback={<p>Loading...</p>}>
-          <>
-            <FormWrapper template={detailFormTemplate} />
+			<div>
+				<Show when={detailFormTemplate()} fallback={<p>Loading...</p>}>
+					<>
+						<FormWrapper template={detailFormTemplate} />
 
-            {/* <h1 class="text-4xl font-extrabold">Full</h1> */}
-            {/* <pre>{JSON.stringify(detailFormTemplate(), null, 2)}</pre> */}
-          </>
-        </Show>
-        <Show when={detailFormTemplate.error}>
-          <p>Oopsie Poopsie</p>
-        </Show>
-      </div>
-    </div>
-  );
+						{/* <h1 class="text-4xl font-extrabold">Full</h1> */}
+						{/* <pre>{JSON.stringify(detailFormTemplate(), null, 2)}</pre> */}
+					</>
+				</Show>
+				<Show when={detailFormTemplate.error}>
+					<p>Oopsie Poopsie</p>
+				</Show>
+			</div>
+		</div>
+	);
 }

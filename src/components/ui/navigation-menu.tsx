@@ -7,11 +7,11 @@ import type {
 import { NavigationMenu as NavigationMenuPrimitive } from "@kobalte/core/navigation-menu";
 import type { PolymorphicProps } from "@kobalte/core/polymorphic";
 import {
+	mergeProps,
 	type ParentProps,
 	Show,
-	type ValidComponent,
-	mergeProps,
 	splitProps,
+	type ValidComponent,
 } from "solid-js";
 
 export const NavigationMenuItem = NavigationMenuPrimitive.Menu;
@@ -34,10 +34,11 @@ type withArrow = {
 };
 
 type navigationMenuProps<T extends ValidComponent = "ul"> = ParentProps<
-	NavigationMenuRootProps<T> &
-		withArrow & {
-			class?: string;
-		}
+	& NavigationMenuRootProps<T>
+	& withArrow
+	& {
+		class?: string;
+	}
 >;
 
 export const NavigationMenu = <T extends ValidComponent = "ul">(
@@ -60,7 +61,10 @@ export const NavigationMenu = <T extends ValidComponent = "ul">(
 
 	return (
 		<NavigationMenuPrimitive
-			class={cn("flex w-max items-center justify-center gap-x-1", local.class)}
+			class={cn(
+				"flex w-max items-center justify-center gap-x-1",
+				local.class,
+			)}
 			{...rest}
 		>
 			{local.children}
@@ -83,10 +87,11 @@ export const NavigationMenu = <T extends ValidComponent = "ul">(
 
 type navigationMenuTriggerProps<T extends ValidComponent = "button"> =
 	ParentProps<
-		NavigationMenuTriggerProps<T> &
-			withArrow & {
-				class?: string;
-			}
+		& NavigationMenuTriggerProps<T>
+		& withArrow
+		& {
+			class?: string;
+		}
 	>;
 
 export const NavigationMenuTrigger = <T extends ValidComponent = "button">(

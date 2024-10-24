@@ -27,7 +27,8 @@ export const DropdownMenu = (props: DropdownMenuRootProps) => {
 };
 
 type dropdownMenuContentProps<T extends ValidComponent = "div"> =
-	DropdownMenuContentProps<T> & {
+	& DropdownMenuContentProps<T>
+	& {
 		class?: string;
 	};
 
@@ -52,7 +53,8 @@ export const DropdownMenuContent = <T extends ValidComponent = "div">(
 };
 
 type dropdownMenuItemProps<T extends ValidComponent = "div"> =
-	DropdownMenuItemProps<T> & {
+	& DropdownMenuItemProps<T>
+	& {
 		class?: string;
 		inset?: boolean;
 	};
@@ -78,7 +80,8 @@ export const DropdownMenuItem = <T extends ValidComponent = "div">(
 };
 
 type dropdownMenuGroupLabelProps<T extends ValidComponent = "span"> =
-	DropdownMenuGroupLabelProps<T> & {
+	& DropdownMenuGroupLabelProps<T>
+	& {
 		class?: string;
 	};
 
@@ -99,7 +102,8 @@ export const DropdownMenuGroupLabel = <T extends ValidComponent = "span">(
 };
 
 type dropdownMenuItemLabelProps<T extends ValidComponent = "div"> =
-	DropdownMenuItemLabelProps<T> & {
+	& DropdownMenuItemLabelProps<T>
+	& {
 		class?: string;
 	};
 
@@ -120,7 +124,8 @@ export const DropdownMenuItemLabel = <T extends ValidComponent = "div">(
 };
 
 type dropdownMenuSeparatorProps<T extends ValidComponent = "hr"> =
-	DropdownMenuSeparatorProps<T> & {
+	& DropdownMenuSeparatorProps<T>
+	& {
 		class?: string;
 	};
 
@@ -144,7 +149,10 @@ export const DropdownMenuShortcut = (props: ComponentProps<"span">) => {
 
 	return (
 		<span
-			class={cn("ml-auto text-xs tracking-widest opacity-60", local.class)}
+			class={cn(
+				"ml-auto text-xs tracking-widest opacity-60",
+				local.class,
+			)}
 			{...rest}
 		/>
 	);
@@ -196,7 +204,8 @@ export const DropdownMenuSubTrigger = <T extends ValidComponent = "div">(
 };
 
 type dropdownMenuSubContentProps<T extends ValidComponent = "div"> =
-	DropdownMenuSubTriggerProps<T> & {
+	& DropdownMenuSubTriggerProps<T>
+	& {
 		class?: string;
 	};
 

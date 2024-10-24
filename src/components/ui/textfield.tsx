@@ -13,7 +13,8 @@ import type { ValidComponent, VoidProps } from "solid-js";
 import { splitProps } from "solid-js";
 
 type textFieldProps<T extends ValidComponent = "div"> =
-	TextFieldRootProps<T> & {
+	& TextFieldRootProps<T>
+	& {
 		class?: string;
 	};
 
@@ -22,7 +23,12 @@ export const TextFieldRoot = <T extends ValidComponent = "div">(
 ) => {
 	const [local, rest] = splitProps(props as textFieldProps, ["class"]);
 
-	return <TextFieldPrimitive class={cn("space-y-1", local.class)} {...rest} />;
+	return (
+		<TextFieldPrimitive
+			class={cn("space-y-1", local.class)}
+			{...rest}
+		/>
+	);
 };
 
 export const textfieldLabel = cva(
@@ -46,7 +52,8 @@ export const textfieldLabel = cva(
 );
 
 type textFieldLabelProps<T extends ValidComponent = "label"> =
-	TextFieldLabelProps<T> & {
+	& TextFieldLabelProps<T>
+	& {
 		class?: string;
 	};
 
@@ -64,7 +71,8 @@ export const TextFieldLabel = <T extends ValidComponent = "label">(
 };
 
 type textFieldErrorMessageProps<T extends ValidComponent = "div"> =
-	TextFieldErrorMessageProps<T> & {
+	& TextFieldErrorMessageProps<T>
+	& {
 		class?: string;
 	};
 
@@ -84,7 +92,8 @@ export const TextFieldErrorMessage = <T extends ValidComponent = "div">(
 };
 
 type textFieldDescriptionProps<T extends ValidComponent = "div"> =
-	TextFieldDescriptionProps<T> & {
+	& TextFieldDescriptionProps<T>
+	& {
 		class?: string;
 	};
 
