@@ -3,6 +3,8 @@ import { Dynamic } from "solid-js/web";
 import { createSignal } from "solid-js";
 import { Button } from "~/components/ui/button.tsx";
 import type { Campaign } from "~/types/campaign.ts";
+import { usePocketbaseContext } from "~/libs/PocketbaseProvider.ts";
+import { Collections } from "~/types/pocketbase-types.ts";
 
 const shortText = await import("~/components/formItemTypes/shortText.tsx");
 const number = await import("~/components/formItemTypes/number.tsx");
@@ -31,7 +33,14 @@ interface QuestionDict {
   [id: string]: Question;
 }
 
-export default function FormWrapper({ campaign }: { campaign: Campaign }) {
+export default function FormWrapper({
+  campaign,
+  userID,
+}: {
+  campaign: Campaign;
+  userID: string;
+}) {
+  const client = usePocketbaseContext();
   const questions = createMemo<QuestionDict>(() => {
     // this will create an array of json objects of type Question
     const t = campaign.expand?.template.expand?.questions?.map((e) => {
@@ -52,7 +61,6 @@ export default function FormWrapper({ campaign }: { campaign: Campaign }) {
       return acc;
     }, {} as QuestionDict);
   });
-  console.log(questions());
   const [formData, setFormData] = createSignal<Record<string, string | number>>(
     Object.values(questions()).reduce(
       (acc, field) => {
@@ -66,6 +74,15 @@ export default function FormWrapper({ campaign }: { campaign: Campaign }) {
 
   const handleChange = (id: string, value: string | number): void => {
     setFormData({ ...formData(), [id]: value });
+  };
+
+  const handleSubmission = async () => {
+    const req = {
+      answers: formData(),
+      campaign: campaign.id,
+      submitter: userID,
+    };
+    const record = await client.collection(Collections.Submissions).create(req);
   };
   return (
     <>
@@ -94,7 +111,7 @@ export default function FormWrapper({ campaign }: { campaign: Campaign }) {
               );
             }}
           </For>
-          <Button onClick={() => console.log(formData())} class="mt-4">
+          <Button onClick={handleSubmission} class="mt-4">
             Submit
           </Button>
         </form>
