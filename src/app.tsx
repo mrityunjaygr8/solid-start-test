@@ -9,6 +9,10 @@ import {
 } from "~/components/ui/navigation-menu.tsx";
 import "~/app.css";
 import { useAuthContext } from "~/libs/AuthProvider.ts";
+import { Toaster } from "~/components/ui/sonner.tsx";
+import { ColorModeProvider, ColorModeScript } from "@kobalte/core";
+import { ToggleButton } from "~/components/ui/toggle.tsx";
+import { Button } from "~/components/ui/button.tsx";
 
 const AuthenticatedNavigation = () => (
   <>
@@ -66,6 +70,7 @@ const AuthenticatedNavigation = () => (
         Submissions
       </NavigationMenuTrigger>
     </NavigationMenuItem>
+    <></>
   </>
 );
 
@@ -99,21 +104,30 @@ export default function App() {
       root={(props) => (
         <MetaProvider>
           <Title>SolidStart - Basic</Title>
-          <div class="flex flex-col h-screen">
-            <nav class="h-14 px-4 py-2">
-              <NavigationMenu>
-                <Show
-                  when={user() != null || user() != undefined}
-                  fallback={<UnauthenticatedNavigation />}
-                >
-                  <AuthenticatedNavigation />
-                </Show>
-              </NavigationMenu>
-            </nav>
-            <main class="flex-grow overflow-hidden">
-              <Suspense>{props.children}</Suspense>
-            </main>
-          </div>
+          <Suspense>
+            <ColorModeScript />
+            <ColorModeProvider>
+              <div class="flex flex-col h-screen">
+                <nav class="h-14 p-4">
+                  <NavigationMenu class="w-full justify-between">
+                    <Show
+                      when={user() != null || user() != undefined}
+                      fallback={<UnauthenticatedNavigation />}
+                    >
+                      <div class="flex">
+                        <AuthenticatedNavigation />
+                      </div>
+                      <Button>{user().email}</Button>
+                    </Show>
+                  </NavigationMenu>
+                </nav>
+                <main class="flex-grow overflow-hidden">
+                  {props.children}
+                  <Toaster closeButton richColors />
+                </main>
+              </div>
+            </ColorModeProvider>
+          </Suspense>
         </MetaProvider>
       )}
     >
