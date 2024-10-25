@@ -15,7 +15,15 @@ const ShortText = ({
   return (
     <TextFieldRoot class="w-full max-w-xs">
       <TextFieldLabel>{questionText}</TextFieldLabel>
-      <TextField type="email" value={value} onChange={() => setValue} />
+      <TextField
+        type="email"
+        value={value}
+        onChange={(e: Event) =>
+          (setValue as (e: string) => void)(
+            (e.target as HTMLInputElement).value,
+          )
+        }
+      />
       <TextFieldDescription>{description}</TextFieldDescription>
     </TextFieldRoot>
   );

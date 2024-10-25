@@ -14,7 +14,7 @@ const Number = ({ questionText, description, value, setValue }: inputProps) => {
   return (
     <NumberField
       rawValue={value as number}
-      onRawValueChange={() => setValue}
+      onRawValueChange={(e: number) => (setValue as (e: number) => void)(e)}
       minValue={0}
     >
       <NumberFieldLabel>{questionText}</NumberFieldLabel>

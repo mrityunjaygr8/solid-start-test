@@ -4,7 +4,12 @@ import { createSignal } from "solid-js";
 import { Button } from "~/components/ui/button.tsx";
 import type { Campaign } from "~/types/campaign.ts";
 import { usePocketbaseContext } from "~/libs/PocketbaseProvider.ts";
-import { Collections } from "~/types/pocketbase-types.ts";
+import {
+  Collections,
+  type SubmissionsRecord,
+  type SubmissionsResponse,
+} from "~/types/pocketbase-types.ts";
+import { toast } from "solid-sonner";
 
 const shortText = await import("~/components/formItemTypes/shortText.tsx");
 const number = await import("~/components/formItemTypes/number.tsx");
@@ -15,7 +20,7 @@ const fieldInputs = {
 
 interface inputProps {
   value: string | number;
-  setValue: (e: InputEvent) => void;
+  setValue: ((e: number) => void) | ((e: string) => void);
   questionText: string;
   description: string;
 }
@@ -72,8 +77,19 @@ export default function FormWrapper({
     ),
   );
 
-  const handleChange = (id: string, value: string | number): void => {
-    setFormData({ ...formData(), [id]: value });
+  const handleChange = (
+    id: string,
+    type: "shortText" | "number",
+  ): ((v: string) => void) | ((v: number) => void) => {
+    if (type == "shortText") {
+      return (value: string) => {
+        setFormData({ ...formData(), [id]: value });
+      };
+    } else {
+      return (value: number) => {
+        setFormData({ ...formData(), [id]: value });
+      };
+    }
   };
 
   const handleSubmission = async () => {
@@ -82,7 +98,13 @@ export default function FormWrapper({
       campaign: campaign.id,
       submitter: userID,
     };
-    const record = await client.collection(Collections.Submissions).create(req);
+
+    toast.promise(client.collection(Collections.Submissions).create(req), {
+      loading: "Creating Submission",
+      success: (data: SubmissionsResponse) =>
+        `Created Submission, ID: ${data.id}`,
+      error: "Error when creating submission",
+    });
   };
   return (
     <>
@@ -91,7 +113,6 @@ export default function FormWrapper({
           {campaign.expand?.template.name}
         </h1>
         <h4 class="text-xl">{campaign.expand?.template.description}</h4>
-
         <form class="w-80 mt-4">
           <For each={campaign.expand?.template.questions}>
             {(questionID) => {
@@ -103,9 +124,7 @@ export default function FormWrapper({
                     questionText={q.questionText}
                     description={q.description}
                     value={formData()[q.id]}
-                    setValue={(e: InputEvent) =>
-                      handleChange(q.id, (e.target as HTMLInputElement).value)
-                    }
+                    setValue={handleChange(q.id, q.formItemName)}
                   />
                 </>
               );
