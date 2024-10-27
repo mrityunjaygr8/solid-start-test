@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   Card,
   CardContent,
@@ -9,12 +9,36 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+
+import classNames from "classnames";
+import { client as getPBClient } from "@/lib/pocketbase";
 
 export const Route = createFileRoute("/_unathenticated/login")({
   component: Page,
 });
 
 export default function Page() {
+  const navigate = useNavigate();
+  const client = getPBClient();
+  const [loginForm, setLoginForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [loginError, setLoginError] = useState(false);
+
+  const handleLogin = async () => {
+    setLoginError(false);
+    const userData = client
+      .collection("users")
+      .authWithPassword(loginForm.email, loginForm.password)
+      .then((e) => e)
+      .catch((e) => {
+        setLoginError(true);
+      });
+    navigate({ to: "/" });
+  };
   return (
     <div className="flex h-screen w-full items-center justify-center px-4">
       <Card className="mx-auto max-w-sm w-[380px]">
@@ -32,6 +56,10 @@ export default function Page() {
                 id="email"
                 type="email"
                 placeholder="m@example.com"
+                value={loginForm.email}
+                onChange={(e) =>
+                  setLoginForm({ ...loginForm, email: e.target.value })
+                }
                 required
               />
             </div>
@@ -45,9 +73,25 @@ export default function Page() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" type="password" required />
+              <Input
+                id="password"
+                type="password"
+                value={loginForm.password}
+                onChange={(e) =>
+                  setLoginForm({ ...loginForm, password: e.target.value })
+                }
+                required
+              />
             </div>
-            <Button type="submit" className="w-full">
+            <p
+              className={classNames({
+                "text-red-500": loginError,
+                "text-transparent": !loginError,
+              })}
+            >
+              Unable to login with provided credentials
+            </p>
+            <Button type="submit" className="w-full" onClick={handleLogin}>
               Login
             </Button>
           </div>
