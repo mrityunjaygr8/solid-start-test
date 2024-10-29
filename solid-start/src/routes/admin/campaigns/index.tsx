@@ -45,7 +45,7 @@ const columns: ColumnDef<CampaignResponse>[] = [
           as="A"
           variant="link"
           class="px-0"
-          href={`/campaigns/${props.row.original.id}/submissions`}
+          href={`/admin/campaigns/${props.row.original.id}/submissions`}
         >
           <Button variant="ghost" size="smallIcon" class="mr-1">
             <IconReportAnalytics />
@@ -66,9 +66,7 @@ export default function ListCampaigns() {
   const [campaigns] = createResource(() =>
     client.collection("campaign").getList<CampaignResponse>(1, 20, {
       expand: "creator,template",
-      filter: client.filter("respondents.id ~ {:userID}", {
-        userID: user().id,
-      }),
+      filter: client.filter("creator.id = {:userID}", { userID: user().id }),
     }),
   );
   return (
@@ -79,9 +77,9 @@ export default function ListCampaigns() {
         {campaigns() && (
           <>
             <div class="flex justify-between my-4">
-              <h1 class="text-xl font-extrabold">Campains assigned to you</h1>
-              <Button as="a" href="/admin/campaigns">
-                Campains Created by you
+              <h1 class="text-xl font-extrabold">Campains created by you</h1>
+              <Button as="a" href="/campaigns">
+                Campains assigned to you
               </Button>
             </div>
             <DataTable columns={columns} data={() => campaigns()?.items} />
