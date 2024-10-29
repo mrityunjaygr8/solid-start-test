@@ -19,7 +19,7 @@ const columns: ColumnDef<CampaignResponse>[] = [
           variant="link"
           as="A"
           class="px-0"
-          href={`/campaigns/${props.row.original.id}`}
+          href={`/admin/campaigns/${props.row.original.id}`}
         >
           <Button variant="ghost" size="smallIcon" class="mr-1">
             <IconLink />
