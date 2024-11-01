@@ -1,12 +1,11 @@
-import { Navigate, A } from "@solidjs/router";
+import { Navigate } from "@solidjs/router";
 import { ColumnDef } from "@tanstack/solid-table";
 import { createResource } from "solid-js";
 import { DataTable } from "~/components/ui/datatable.tsx";
 import { useAuthContext } from "~/libs/AuthProvider.ts";
 import { usePocketbaseContext } from "~/libs/PocketbaseProvider.ts";
 import { CampaignResponse } from "~/types/pocketbase-types.ts";
-import { cn } from "~/libs/cn.ts";
-import { Button, buttonVariants } from "~/components/ui/button.tsx";
+import { Button } from "~/components/ui/button.tsx";
 import { IconLink, IconReportAnalytics } from "@tabler/icons-solidjs";
 
 const columns: ColumnDef<CampaignResponse>[] = [
@@ -66,7 +65,7 @@ export default function ListCampaigns() {
   const [campaigns] = createResource(() =>
     client.collection("campaign").getList<CampaignResponse>(1, 20, {
       expand: "creator,template",
-      filter: client.filter("respondents.id ~ {:userID}", {
+      filter: client.filter("respondents ~ {:userID}", {
         userID: user().id,
       }),
     }),
