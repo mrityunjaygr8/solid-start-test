@@ -12,6 +12,17 @@ import {
   CardTitle,
 } from "~/components/ui/card.tsx";
 import type { UsersResponse } from "~/types/pocketbase-types.ts";
+import { PB_SERVER } from "~/libs/pb.ts";
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table.tsx";
 
 export default function DetailCampaign() {
   const client = usePocketbaseContext();
@@ -27,6 +38,13 @@ export default function DetailCampaign() {
       .getOne<Campaign>(params.id, { expand: "template,respondents" }),
   );
 
+  const [campaignSubmission] = createResource(async () => {
+    const response = await fetch(
+      `${PB_SERVER}/admin/campaigns/${params.id}/submissions`,
+    );
+    const j = await response.json();
+    return j;
+  });
   const respondents = createMemo(() => {
     if (campaigns()) {
       const temp = campaigns().expand.respondents.map((e: UsersResponse) => ({
@@ -44,8 +62,9 @@ export default function DetailCampaign() {
       <div>
         {campaigns.loading && "Loading"}
         {campaigns.error && "Error loading submissions"}
-        {campaigns() && (
+        {campaigns() && campaignSubmission() && (
           <>
+            {/* <pre>{JSON.stringify(campaignSubmission(), null, 2)}</pre> */}
             <h1 class="text-4xl font-bold py-4">
               List Submissions for {campaigns().name}
             </h1>
@@ -68,21 +87,30 @@ export default function DetailCampaign() {
                   </div>
                 </div>
                 <div>
-                  <h4 class="text-xl font-semibold">Respondents</h4>
-                  <For each={campaigns().respondents}>
-                    {(respondent) => {
-                      return <p>{respondents()[respondent]}</p>;
-                    }}
-                  </For>
+                  <h4 class="text-xl font-semibold">Submissions</h4>
+                  <Table class="w-80">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>User</TableHead>
+                        <TableHead>Submissions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <For each={campaignSubmission()}>
+                        {(submission) => {
+                          return (
+                            <TableRow>
+                              <TableCell>{submission.name}</TableCell>
+                              <TableCell>{submission.count}</TableCell>
+                            </TableRow>
+                          );
+                        }}
+                      </For>
+                    </TableBody>
+                  </Table>
                 </div>
               </CardContent>
             </Card>
-            <div>
-              <h4 class="text-xl font-bold">Template</h4>
-              <p>{campaigns().expand?.template.name}</p>
-            </div>
-            <pre>{JSON.stringify(respondents(), null, 2)}</pre>
-            <pre>{JSON.stringify(campaigns(), null, 2)}</pre>
           </>
         )}
       </div>
