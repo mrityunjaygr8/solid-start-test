@@ -1,7 +1,6 @@
-import { createSignal, Show } from "solid-js";
+import { createEffect, createResource, createSignal, Show } from "solid-js";
 import {
   TextField,
-  TextFieldDescription,
   TextFieldLabel,
   TextFieldRoot,
 } from "~/components/ui/textfield.tsx";
@@ -16,7 +15,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -39,33 +37,64 @@ import {
 } from "~/components/ui/switch";
 import {
   Collections,
-  type SubmissionsRecord,
+  FormItemTypeRecord,
+  FormItemTypeResponse,
   type SubmissionsResponse,
-} from "~/types/pocketbase-types.ts";
+} from "~/types/pocketbase-types";
 
-export default function create_questions() {
-  const [questionText, setQuestionText] = createSignal("");
-  const [description, setDescription] = createSignal("");
-  const [questionType, setQuestionType] = createSignal("shortText");
-  const [required, setrequired] = createSignal(false);
-  const [minValue, setMinValue] = createSignal(0);
-  const [maxValue, setMaxValue] = createSignal(0);
-
+export default function CreateQuestions() {
   const client = usePocketbaseContext();
 
+  const [questionText, setQuestionText] = createSignal("");
+  const [description, setDescription] = createSignal("");
+  const [questionType, setQuestionType] = createSignal("");
+  const [required, setRequired] = createSignal(false);
+  const [minValue, setMinValue] = createSignal(0);
+  const [maxValue, setMaxValue] = createSignal(0);
+  const [selectQuestionTypeOptions, setSelectQuestionTypeOptions] =
+    createSignal<string[]>([]);
+
+  const [formItemTypes] = createResource(() =>
+    client.collection("formItemType").getList<FormItemTypeResponse>()
+  );
+
+  createEffect(() => {
+    if (formItemTypes() && !formItemTypes.loading) {
+      const idNames = formItemTypes().items.map(
+        (item: FormItemTypeRecord) => item.name
+      );
+      setSelectQuestionTypeOptions(idNames);
+    }
+  });
+
   const handleSubmission = async () => {
+    const findIdByName = () =>
+      formItemTypes()?.items.find(
+        (item: FormItemTypeRecord) => item.name === questionType()
+      )?.id;
+
     const req = {
       questionText: questionText(),
       description: description(),
-      questionType: questionType(),
-      // values:[{name:"required",value:required(),}]
+      formItemType: findIdByName(),
       values: {
-        required: required(),
-        minValue: minValue(),
-        maxValue: maxValue(),
+        options: [
+          { type: "required", value: required() },
+          ...(questionType() === "shortText"
+            ? [
+                { type: "minLength", value: minValue() },
+                { type: "maxLength", value: maxValue() },
+              ]
+            : questionType() === "number"
+            ? [
+                { type: "minValue", value: minValue() },
+                { type: "maxValue", value: maxValue() },
+              ]
+            : []),
+        ],
       },
     };
-
+    console.log(req);
     toast.promise(client.collection(Collections.FormItemQuestion).create(req), {
       loading: "Creating Question",
       success: (data: SubmissionsResponse) =>
@@ -73,6 +102,7 @@ export default function create_questions() {
       error: "Error when creating submission",
     });
   };
+  console.log(questionType());
   return (
     <div class="flex items-center justify-center h-full overflow-y-auto">
       <Card class="w-3/6">
@@ -82,14 +112,15 @@ export default function create_questions() {
         <CardContent>
           <form
             class="space-y-4"
-            onSubmit={() => handleSubmission()}
-            //   style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmission();
+            }}
           >
             <TextFieldRoot class="w-full max-w-xs">
               <TextFieldLabel>Question</TextFieldLabel>
               <TextField
                 placeholder="Enter Question"
-                type="email"
                 value={questionText()}
                 onInput={(e) => setQuestionText(e.currentTarget.value)}
               />
@@ -100,15 +131,14 @@ export default function create_questions() {
                 value={description()}
                 onInput={(e) => setDescription(e.currentTarget.value)}
                 placeholder="Enter Description"
-                type="email"
               />
             </TextFieldRoot>
             <Switch
-              value={required()}
-              onChange={() => setrequired(!required)}
+              checked={required()}
+              onChange={() => setRequired(!required())}
               class="flex items-center space-x-2"
             >
-              <SwitchLabel class="text-sm font-medium leading-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-70">
+              <SwitchLabel class="text-sm font-medium leading-none">
                 Required*
               </SwitchLabel>
               <SwitchControl>
@@ -119,7 +149,8 @@ export default function create_questions() {
             <Select
               class="w-full max-w-xs"
               placeholder="Select Value"
-              options={["shortText", "number"]}
+              onChange={(value) => setQuestionType(value || "")}
+              options={selectQuestionTypeOptions()}
               itemComponent={(props) => (
                 <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>
               )}
@@ -132,49 +163,52 @@ export default function create_questions() {
               </SelectTrigger>
               <SelectContent />
             </Select>
-            {/* <Show when={questionType() === "Number"}> */}
-            <NumberField
-              rawValue={minValue()}
-              onRawValueChange={(e: number) =>
-                (setMinValue as (e: number) => void)(e)
+
+            <Show
+              when={
+                questionType() === "number" || questionType() === "shortText"
               }
-              defaultValue={0}
-              minValue={0}
             >
-              <NumberFieldLabel>Enter Min Value</NumberFieldLabel>
-              <NumberFieldGroup>
-                <NumberFieldDecrementTrigger aria-label="Decrement" />
-                <NumberFieldInput />
-                <NumberFieldIncrementTrigger aria-label="Increment" />
-              </NumberFieldGroup>
-            </NumberField>
-            <NumberField
-              rawValue={maxValue()}
-              onRawValueChange={(e: number) =>
-                (setMaxValue as (e: number) => void)(e)
-              }
-              defaultValue={0}
-              minValue={0}
-            >
-              <NumberFieldLabel>Enter Max Value</NumberFieldLabel>
-              <NumberFieldGroup>
-                <NumberFieldDecrementTrigger aria-label="Decrement" />
-                <NumberFieldInput />
-                <NumberFieldIncrementTrigger aria-label="Increment" />
-              </NumberFieldGroup>
-            </NumberField>
-            {/* </Show> */}
+              <NumberField
+                rawValue={minValue()}
+                onRawValueChange={setMinValue}
+                defaultValue={0}
+                minValue={0}
+              >
+                <NumberFieldLabel>Enter Min Value</NumberFieldLabel>
+                <NumberFieldGroup>
+                  <NumberFieldDecrementTrigger aria-label="Decrement" />
+                  <NumberFieldInput />
+                  <NumberFieldIncrementTrigger aria-label="Increment" />
+                </NumberFieldGroup>
+              </NumberField>
+              <NumberField
+                rawValue={maxValue()}
+                onRawValueChange={setMaxValue}
+                defaultValue={0}
+                minValue={0}
+              >
+                <NumberFieldLabel>Enter Max Value</NumberFieldLabel>
+                <NumberFieldGroup>
+                  <NumberFieldDecrementTrigger aria-label="Decrement" />
+                  <NumberFieldInput />
+                  <NumberFieldIncrementTrigger aria-label="Increment" />
+                </NumberFieldGroup>
+              </NumberField>
+            </Show>
           </form>
         </CardContent>
         <CardFooter class="justify-end gap-4">
-          <Button type="button" variant="destructive">
+          <Button
+            class="border-red-500"
+            type="button"
+            variant="outline"
+            as="a"
+            href="/questions"
+          >
             Cancel
           </Button>
-          <Button
-            onClick={() => handleSubmission()}
-            type="submit"
-            class="bg-lime-700 text-destructive-foreground shadow-sm hover:bg-lime-800/90"
-          >
+          <Button type="submit" onClick={handleSubmission}>
             Submit
           </Button>
         </CardFooter>

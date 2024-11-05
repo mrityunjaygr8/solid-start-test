@@ -4,10 +4,10 @@ import { DataTable } from "~/components/ui/datatable.tsx";
 import { useAuthContext } from "~/libs/AuthProvider.ts";
 import { usePocketbaseContext } from "~/libs/PocketbaseProvider.ts";
 import { FormTemplateResponse } from "~/types/pocketbase-types.ts";
-import { buttonVariants } from "~/components/ui/button.tsx";
+import { Button, buttonVariants } from "~/components/ui/button.tsx";
 import { cn } from "~/libs/cn.ts";
 import { A, Navigate } from "@solidjs/router";
-import { IconLink } from "@tabler/icons-solidjs";
+import { IconArrowRight, IconLink } from "@tabler/icons-solidjs";
 
 const columns: ColumnDef<FormTemplateResponse>[] = [
   {
@@ -24,7 +24,7 @@ const columns: ColumnDef<FormTemplateResponse>[] = [
                 size: "smallIcon",
               }),
               "self-center",
-              "mr-2",
+              "mr-2"
             )}
           >
             <IconLink />
@@ -57,11 +57,23 @@ export default function ListFormTemplate() {
   const [formTemplates] = createResource(() =>
     client.collection("formTemplate").getList<FormTemplateResponse>(1, 20, {
       expand: "questions",
-    }),
+    })
   );
   return (
     <div class="flex flex-col p-4">
-      <h1>ListFormItemType</h1>
+      <div class=" p-3 flex items-center justify-between">
+        {" "}
+        <h1>ListFormItemType</h1>{" "}
+        <Button
+          class="border-blue-500"
+          type="button"
+          variant="outline"
+          as="a"
+          href="/templates/create_template"
+        >
+          Create Template <IconArrowRight></IconArrowRight>
+        </Button>{" "}
+      </div>
 
       <div>
         {formTemplates.loading && "Loading"}
