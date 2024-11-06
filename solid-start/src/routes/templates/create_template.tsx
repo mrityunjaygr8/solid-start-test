@@ -41,9 +41,9 @@ export default function create_template() {
   const [questionType, setQuestionType] = createSignal("short-text");
 
   const [questionsOptions, setQuestionsOptions] = createSignal<
-    { value: string; lable: string }[]
-  >([]);
-  const [values, setValues] = createSignal<{ value: string; lable: string }[]>(
+    { value: string; label: string }[]
+  >([] as { value: string; label: string }[]);
+  const [values, setValues] = createSignal<{ value: string; label: string }[]>(
     []
   );
 
@@ -110,13 +110,17 @@ export default function create_template() {
               />
             </TextFieldRoot>
 
-            <Select<string>
+            <Select
               multiple
-              optionValue={"value"}
-              optionTextValue={"value"}
+              optionValue={(option) =>
+                (option as unknown as { value: string; label: string }).value
+              }
+              optionTextValue={(option) =>
+                (option as unknown as { value: string; label: string }).label
+              }
               class="w-full max-w-xs"
               placeholder="Select Questions"
-              value={values()}
+              value={values() as unknown as { value: string; label: string }[]}
               onChange={setValues}
               options={questionsOptions()}
               itemComponent={(props) => (
