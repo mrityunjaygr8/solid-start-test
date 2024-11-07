@@ -109,7 +109,7 @@ export default function create_template() {
               />
             </TextFieldRoot>
 
-            <Select
+            <Select<{ value: string; label: string }>
               multiple
               optionValue={(option) =>
                 (option as unknown as { value: string; label: string }).value
@@ -125,7 +125,6 @@ export default function create_template() {
               itemComponent={(props) => (
                 <SelectItem item={props.item}>
                   {props.item.rawValue.label}
-                  {console.log(props.item)}
                 </SelectItem>
               )}
             >
@@ -135,7 +134,7 @@ export default function create_template() {
                 aria-label="Fruits"
                 as="div"
               >
-                <Select.Value class="w-full">
+                <Select.Value<{ value: string; label: string }> class="w-full">
                   {(state) => (
                     <div class=" flex items-center gap-2 flex-grow text-ellipsis py-1">
                       <span class="flex w-full justify-between items-center gap-2 flex-wrap">

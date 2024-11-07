@@ -17,8 +17,7 @@ const LongText = ({
     <TextFieldRoot class="w-full max-w-xs">
       <TextFieldLabel>{questionText}</TextFieldLabel>
       <TextArea
-        type="input"
-        value={value}
+        value={value as unknown as string}
         onChange={(e: Event) =>
           (setValue as (e: string) => void)(
             (e.target as HTMLInputElement).value

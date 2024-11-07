@@ -10,6 +10,7 @@ import {
   type SubmissionsResponse,
 } from "~/types/pocketbase-types.ts";
 import { toast } from "solid-sonner";
+import { createStore } from "solid-js/store";
 
 const shortText = await import("~/components/formItemTypes/shortText.tsx");
 const number = await import("~/components/formItemTypes/number.tsx");
@@ -72,7 +73,7 @@ export default function FormWrapper({
     }, {} as QuestionDict);
   });
 
-  const [formData, setFormData] = createSignal<
+  const [formData, setFormData] = createStore<
     Record<string, string | number | boolean>
   >(
     Object.values(questions()).reduce((acc, field) => {
@@ -91,17 +92,17 @@ export default function FormWrapper({
     type: "shortText" | "number" | "longText" | "boolean" | "select"
   ): ((v: string | number | boolean) => void) => {
     return (value: string | number | boolean) => {
-      setFormData({ ...formData(), [id]: value });
+      setFormData(id, value);
     };
   };
 
   const handleSubmission = async () => {
     const req = {
-      answers: formData(),
+      answers: formData,
       campaign: campaign.id,
       submitter: userID,
     };
-
+    console.log(req.answers);
     toast.promise(client.collection(Collections.Submissions).create(req), {
       loading: "Creating Submission",
       success: (data: SubmissionsResponse) =>
@@ -126,7 +127,7 @@ export default function FormWrapper({
                   component={fieldInputs[q.formItemName].default}
                   questionText={q.questionText}
                   description={q.description}
-                  value={formData()[q.id]}
+                  value={formData[q.id]}
                   setValue={handleChange(q.id, q.formItemName)}
                   options={q.values as unknown as string[]}
                 />

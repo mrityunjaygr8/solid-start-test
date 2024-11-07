@@ -188,7 +188,7 @@ export default function create_template() {
               />
             </TextFieldRoot>
 
-            <Select
+            <Select<{ value: string; label: string }>
               optionValue="value"
               optionTextValue="value"
               class="w-full max-w-xs"
@@ -198,13 +198,12 @@ export default function create_template() {
               itemComponent={(props) => (
                 <SelectItem item={props.item}>
                   {props.item.rawValue.label}
-                  {console.log(props.item)}
                 </SelectItem>
               )}
             >
               <Select.Label>Select Template </Select.Label>
               <SelectTrigger>
-                <SelectValue<string>>
+                <SelectValue<{ value: string; label: string }>>
                   {(state) => state.selectedOption().label}
                 </SelectValue>
               </SelectTrigger>

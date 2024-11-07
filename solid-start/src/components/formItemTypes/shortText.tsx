@@ -17,7 +17,7 @@ const ShortText = ({
       <TextFieldLabel>{questionText}</TextFieldLabel>
       <TextField
         type="input"
-        value={value}
+        value={value as unknown as string}
         onChange={(e: Event) =>
           (setValue as (e: string) => void)(
             (e.target as HTMLInputElement).value
