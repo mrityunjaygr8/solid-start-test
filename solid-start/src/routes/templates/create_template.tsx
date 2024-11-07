@@ -92,7 +92,6 @@ export default function create_template() {
               <TextFieldLabel>Name</TextFieldLabel>
               <TextField
                 placeholder="Enter Name"
-                type="email"
                 value={name()}
                 onChange={(e: Event) =>
                   (setName as (e: string) => void)(

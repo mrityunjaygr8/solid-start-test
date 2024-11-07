@@ -13,24 +13,32 @@ import { toast } from "solid-sonner";
 
 const shortText = await import("~/components/formItemTypes/shortText.tsx");
 const number = await import("~/components/formItemTypes/number.tsx");
+const longText = await import("~/components/formItemTypes/longText");
+const boolean = await import("~/components/formItemTypes/boolean.tsx");
+const select = await import("~/components/formItemTypes/selectType");
+
 const fieldInputs = {
-  shortText: shortText,
-  number: number,
+  shortText,
+  number,
+  longText,
+  boolean: boolean,
+  select,
 };
 
 interface inputProps {
-  value: string | number;
-  setValue: ((e: number) => void) | ((e: string) => void);
+  value: string | number | boolean;
+  setValue: (e: string | number | boolean) => void;
   questionText: string;
   description: string;
+  options?: string[];
 }
 
 interface Question {
   id: string;
   questionText: string;
   description: string;
-  values: object;
-  formItemName: "number" | "shortText";
+  values: object | string[];
+  formItemName: "number" | "shortText" | "longText" | "boolean" | "select";
   formItemSchema: object;
 }
 
@@ -46,19 +54,16 @@ export default function FormWrapper({
   userID: string;
 }) {
   const client = usePocketbaseContext();
+
   const questions = createMemo<QuestionDict>(() => {
-    // this will create an array of json objects of type Question
-    const t = campaign.expand?.template.expand?.questions?.map((e) => {
-      const v = {
-        id: e.id,
-        questionText: e.questionText,
-        description: e.description,
-        values: e.values?.options,
-        formItemName: e.expand?.formItemType.name,
-        formItemSchema: e.expand?.formItemType.schema?.options,
-      };
-      return v;
-    }) as Question[];
+    const t = campaign.expand?.template.expand?.questions?.map((e) => ({
+      id: e.id,
+      questionText: e.questionText,
+      description: e.description,
+      values: e.values?.options,
+      formItemName: e.expand?.formItemType.name,
+      formItemSchema: e.expand?.formItemType.schema?.options,
+    })) as Question[];
     // this will convert the array of questions to a QuestionDict
     // where the key will be value of question id field
     return t.reduce((acc: QuestionDict, curr: Question) => {
@@ -66,30 +71,28 @@ export default function FormWrapper({
       return acc;
     }, {} as QuestionDict);
   });
-  const [formData, setFormData] = createSignal<Record<string, string | number>>(
-    Object.values(questions()).reduce(
-      (acc, field) => {
-        acc[field.id] =
-          field.formItemName === "shortText" ? "deafult-value" : 23;
-        return acc;
-      },
-      {} as Record<string, string | number>,
-    ),
+
+  const [formData, setFormData] = createSignal<
+    Record<string, string | number | boolean>
+  >(
+    Object.values(questions()).reduce((acc, field) => {
+      acc[field.id] =
+        field.formItemName === "shortText" || field.formItemName === "longText"
+          ? ""
+          : field.formItemName === "boolean"
+          ? false
+          : 0;
+      return acc;
+    }, {} as Record<string, string | number | boolean>)
   );
 
   const handleChange = (
     id: string,
-    type: "shortText" | "number",
-  ): ((v: string) => void) | ((v: number) => void) => {
-    if (type == "shortText") {
-      return (value: string) => {
-        setFormData({ ...formData(), [id]: value });
-      };
-    } else {
-      return (value: number) => {
-        setFormData({ ...formData(), [id]: value });
-      };
-    }
+    type: "shortText" | "number" | "longText" | "boolean" | "select"
+  ): ((v: string | number | boolean) => void) => {
+    return (value: string | number | boolean) => {
+      setFormData({ ...formData(), [id]: value });
+    };
   };
 
   const handleSubmission = async () => {
@@ -106,6 +109,7 @@ export default function FormWrapper({
       error: "Error when creating submission",
     });
   };
+
   return (
     <>
       <Show when={questions()} fallback={<p>Loading....</p>}>
@@ -118,15 +122,14 @@ export default function FormWrapper({
             {(questionID) => {
               const q = questions()[questionID];
               return (
-                <>
-                  <Dynamic
-                    component={fieldInputs[q.formItemName].default}
-                    questionText={q.questionText}
-                    description={q.description}
-                    value={formData()[q.id]}
-                    setValue={handleChange(q.id, q.formItemName)}
-                  />
-                </>
+                <Dynamic
+                  component={fieldInputs[q.formItemName].default}
+                  questionText={q.questionText}
+                  description={q.description}
+                  value={formData()[q.id]}
+                  setValue={handleChange(q.id, q.formItemName)}
+                  options={q.values as unknown as string[]}
+                />
               );
             }}
           </For>

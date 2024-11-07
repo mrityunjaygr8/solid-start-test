@@ -5,18 +5,18 @@ import {
   TextFieldRoot,
 } from "~/components/ui/textfield.tsx";
 import type { inputProps } from "~/components/formWrapper.tsx";
+import { Checkbox, CheckboxControl, CheckboxLabel } from "../ui/checkbox";
 
-const ShortText = ({
+const Boolean = ({
   description,
   questionText,
   value,
   setValue,
 }: inputProps) => {
   return (
-    <TextFieldRoot class="w-full max-w-xs">
-      <TextFieldLabel>{questionText}</TextFieldLabel>
-      <TextField
-        type="input"
+    <Checkbox class="flex items-center space-x-2">
+      <CheckboxLabel>{questionText}</CheckboxLabel>
+      <CheckboxControl
         value={value}
         onChange={(e: Event) =>
           (setValue as (e: string) => void)(
@@ -25,8 +25,8 @@ const ShortText = ({
         }
       />
       <TextFieldDescription>{description}</TextFieldDescription>
-    </TextFieldRoot>
+    </Checkbox>
   );
 };
 
-export default ShortText;
+export default Boolean;

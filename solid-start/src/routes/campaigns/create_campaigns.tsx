@@ -171,7 +171,6 @@ export default function create_template() {
               <TextFieldLabel>Name</TextFieldLabel>
               <TextField
                 placeholder="Enter Name"
-                type="email"
                 value={name()}
                 onChange={(e: Event) =>
                   (setName as (e: string) => void)(
@@ -188,6 +187,7 @@ export default function create_template() {
                 placeholder="Enter Description"
               />
             </TextFieldRoot>
+
             <Select
               optionValue="value"
               optionTextValue="value"
@@ -214,18 +214,16 @@ export default function create_template() {
               multiple
               optionValue={(option) =>
                 (option as unknown as { value: string; label: string }).value
-              } // Explicitly cast each option to resolve typing
+              }
               optionTextValue={(option) =>
                 (option as unknown as { value: string; label: string }).label
               }
               class="w-full max-w-xs"
               placeholder="Select Users"
-              value={
-                userValue() as unknown as { value: string; label: string }[]
-              }
+              value={userValue() as unknown as any}
               onChange={setUserValue}
               options={usersOptions()}
-              itemComponent={(props) => (
+              itemComponent={(props: any) => (
                 <SelectItem item={props.item}>
                   {props.item.rawValue.label}
                   {console.log(props.item)}
@@ -243,7 +241,7 @@ export default function create_template() {
                     <div class=" flex items-center gap-2 flex-grow text-ellipsis py-1">
                       <span class="flex w-full  items-center gap-2 flex-wrap">
                         <For each={state.selectedOptions()}>
-                          {(option) => (
+                          {(option: any) => (
                             <span class="text-ellipsis  bg-zinc-100 dark:bg-zinc-700 text-sm px-2 py-0.5 rounded inline-flex items-center gap-x-2">
                               <span>{option.label}</span>
                               <button
@@ -269,10 +267,13 @@ export default function create_template() {
               </SelectTrigger>
               <SelectContent />
             </Select>
-
             <DatePicker
               onValueChange={(v) => {
-                console.log(v), setDeadlineStore("date", v.valueAsString);
+                console.log(v),
+                  setDeadlineStore(
+                    "date",
+                    v.valueAsString as unknown as string
+                  );
               }}
             >
               <DatePickerLabel>Set Deadline</DatePickerLabel>

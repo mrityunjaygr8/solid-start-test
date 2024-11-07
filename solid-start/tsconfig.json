@@ -12,7 +12,7 @@
     "noEmit": true,
     "types": ["vinxi/types/client"],
     "isolatedModules": true,
-    "allowImportingTsExtensions": false,
+    "allowImportingTsExtensions": true,
     
     "paths": {
       "~/*": ["./src/*"]

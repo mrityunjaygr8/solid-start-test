@@ -5,8 +5,9 @@ import {
   TextFieldRoot,
 } from "~/components/ui/textfield.tsx";
 import type { inputProps } from "~/components/formWrapper.tsx";
+import { TextArea } from "../ui/textarea";
 
-const ShortText = ({
+const LongText = ({
   description,
   questionText,
   value,
@@ -15,7 +16,7 @@ const ShortText = ({
   return (
     <TextFieldRoot class="w-full max-w-xs">
       <TextFieldLabel>{questionText}</TextFieldLabel>
-      <TextField
+      <TextArea
         type="input"
         value={value}
         onChange={(e: Event) =>
@@ -29,4 +30,4 @@ const ShortText = ({
   );
 };
 
-export default ShortText;
+export default LongText;
