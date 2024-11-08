@@ -6,7 +6,11 @@ import { useAuthContext } from "~/libs/AuthProvider.ts";
 import { usePocketbaseContext } from "~/libs/PocketbaseProvider.ts";
 import { CampaignResponse } from "~/types/pocketbase-types.ts";
 import { Button } from "~/components/ui/button.tsx";
-import { IconLink, IconReportAnalytics } from "@tabler/icons-solidjs";
+import {
+  IconArrowRight,
+  IconLink,
+  IconReportAnalytics,
+} from "@tabler/icons-solidjs";
 
 const columns: ColumnDef<CampaignResponse>[] = [
   {
@@ -68,7 +72,7 @@ export default function ListCampaigns() {
       filter: client.filter("respondents ~ {:userID}", {
         userID: user().id,
       }),
-    }),
+    })
   );
   return (
     <div class="flex flex-col p-4">
@@ -79,9 +83,20 @@ export default function ListCampaigns() {
           <>
             <div class="flex justify-between my-4">
               <h1 class="text-xl font-extrabold">Campains assigned to you</h1>
-              <Button as="a" href="/admin/campaigns">
-                Campains Created by you
-              </Button>
+              <div>
+                <Button
+                  class="border-blue-500"
+                  type="button"
+                  variant="outline"
+                  as="a"
+                  href="/campaigns/create_campaigns"
+                >
+                  Create Campaign <IconArrowRight></IconArrowRight>
+                </Button>{" "}
+                <Button as="a" href="/admin/campaigns">
+                  Campains Created by you
+                </Button>
+              </div>
             </div>
             <DataTable columns={columns} data={() => campaigns()?.items} />
           </>

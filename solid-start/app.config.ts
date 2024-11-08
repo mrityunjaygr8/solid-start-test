@@ -9,6 +9,7 @@ export default defineConfig({
   ssr: false,
   vite: {
     resolve: {
+      // extensions: [".ts", ".tsx", ".js"],
       alias: {
         "~": resolve(__dirname, "./src"),
       },

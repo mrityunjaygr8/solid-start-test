@@ -13,7 +13,7 @@ app.config.timestamp_*.js
 
 # dependencies
 node_modules
-
+pb_data
 # IDEs and editors
 /.idea
 .project
