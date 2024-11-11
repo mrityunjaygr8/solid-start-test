@@ -13,7 +13,7 @@ app.config.timestamp_*.js
 
 # dependencies
 node_modules
-
+pb_data
 # IDEs and editors
 /.idea
 .project
@@ -36,3 +36,4 @@ devenv.local.nix
 
 # pre-commit
 .pre-commit-config.yaml
+pb_data

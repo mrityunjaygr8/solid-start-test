@@ -3,9 +3,12 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
     "jsxImportSource": "solid-js"
+    
+    
   },
   "imports": {
-    "~/": "./src/"
+    "~/": "./src/",
+    "ark": "npm:@ark-ui/solid"
   },
   "fmt": {
     "useTabs": true,
@@ -36,6 +39,7 @@
       "exclude": ["no-unused-vars"]
     }
   },
-  "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json"
+  "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
+  "nodeModulesDir":"auto"
 }
 
