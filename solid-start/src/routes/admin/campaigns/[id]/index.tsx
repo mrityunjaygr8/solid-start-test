@@ -1,7 +1,7 @@
 import { usePocketbaseContext } from "~/libs/PocketbaseProvider.ts";
 import { useAuthContext } from "~/libs/AuthProvider.ts";
 import { Navigate, useParams } from "@solidjs/router";
-import { createResource, For, createMemo } from "solid-js";
+import { createResource, createEffect, on, createSignal } from "solid-js";
 import { Collections } from "~/types/pocketbase-types.ts";
 import type { Campaign } from "~/types/campaign.ts";
 import {
@@ -11,18 +11,10 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card.tsx";
-import type { UsersResponse } from "~/types/pocketbase-types.ts";
-import { PB_SERVER } from "~/libs/pb.ts";
-
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table.tsx";
+import type { SubmissionsResponse } from "~/types/pocketbase-types.ts";
+import { ColumnDef } from "@tanstack/solid-table";
+import { DataTable } from "~/components/ui/datatable.tsx";
+import type { FormItemQuestion } from "~/types/formItemQuestion.ts";
 
 export default function DetailCampaign() {
   const client = usePocketbaseContext();
@@ -38,36 +30,59 @@ export default function DetailCampaign() {
       .getOne<Campaign>(params.id, { expand: "template,respondents" }),
   );
 
-  const [campaignSubmission] = createResource(async () => {
-    const response = await fetch(
-      `${PB_SERVER}/admin/campaigns/${params.id}/submissions`,
-    );
-    const j = await response.json();
-    return j;
-  });
-  const respondents = createMemo(() => {
-    if (campaigns()) {
-      const temp = campaigns().expand.respondents.map((e: UsersResponse) => ({
-        [e.id]: e.name,
-      }));
-      const flattened_temp = temp.reduce((acc: object, curr: object) => ({
-        ...acc,
-        ...curr,
-      }));
-      return flattened_temp;
-    }
-  });
+  const [ready, setReady] = createSignal(false);
+  const [campaignSubmissionColumns, setCampaignSubmissionColumns] =
+    createSignal<ColumnDef<SubmissionsResponse>[]>([
+      {
+        accessorKey: "expand.submitter.name",
+        header: "Submitter Name",
+      },
+    ]);
+  const [campaignSubmission] = createResource(() =>
+    client
+      .collection(Collections.Submissions)
+      .getList<SubmissionsResponse>(1, 20, {
+        expand: "campaign,submitter",
+        filter: client.filter("campaign = {:id}", { id: params.id }),
+      }),
+  );
+
+  const [questions] = createResource(campaigns, () =>
+    client.collection(Collections.FormItemQuestion).getFullList({
+      filter: campaigns()
+        ?.expand.template.questions.map((id: string) => `id="${id}"`)
+        .join("||"),
+    }),
+  );
+
+  createEffect(
+    on(questions, () => {
+      const question = questions();
+      if (question) {
+        setCampaignSubmissionColumns([
+          ...campaignSubmissionColumns(),
+          ...question.map((q: FormItemQuestion) => {
+            return {
+              accessorKey: `answers.${q.id}`,
+              header: q.questionText,
+            };
+          }),
+        ]);
+        setReady(true);
+      }
+    }),
+  );
+
+  // createEffect(() => console.log(campaignSubmissionColumns()));
+
   return (
     <div class="flex flex-col p-4">
       <div>
         {campaigns.loading && "Loading"}
         {campaigns.error && "Error loading submissions"}
-        {campaigns() && campaignSubmission() && (
+        {campaigns() && (
           <>
-            {/* <pre>{JSON.stringify(campaignSubmission(), null, 2)}</pre> */}
-            <h1 class="text-4xl font-bold py-4">
-              List Submissions for {campaigns().name}
-            </h1>
+            <h1 class="text-4xl font-bold py-4">{campaigns().name} Details</h1>
             <Card class="my-4">
               <CardHeader>
                 <CardTitle class="text-xl font-semibold">
@@ -86,31 +101,23 @@ export default function DetailCampaign() {
                     <p>{campaigns().deadline}</p>
                   </div>
                 </div>
-                <div>
-                  <h4 class="text-xl font-semibold">Submissions</h4>
-                  <Table class="w-80">
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>User</TableHead>
-                        <TableHead>Submissions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <For each={campaignSubmission()}>
-                        {(submission) => {
-                          return (
-                            <TableRow>
-                              <TableCell>{submission.name}</TableCell>
-                              <TableCell>{submission.count}</TableCell>
-                            </TableRow>
-                          );
-                        }}
-                      </For>
-                    </TableBody>
-                  </Table>
-                </div>
               </CardContent>
             </Card>
+            <div>
+              {campaignSubmission.loading && "Loading"}
+              {campaignSubmission.error && "Error loading campaign submissions"}
+              {campaignSubmission() && ready() && (
+                <>
+                  <h1 class="text-4xl font-bold py-4">
+                    {campaigns().name} Submissions
+                  </h1>
+                  <DataTable
+                    columns={campaignSubmissionColumns()}
+                    data={() => campaignSubmission().items}
+                  />
+                </>
+              )}
+            </div>
           </>
         )}
       </div>
